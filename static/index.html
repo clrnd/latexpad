@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<!--
+
+  LaTeX Scratchpad - A web mashup thingo for people with busy maths needs.
+  Copyright (C) 2013 Michael James Gratton <mike@vee.net>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+
+<html>
+ <head>
+  <title>LaTeX Scratch Pad</title>
+
+  <style>
+    html, h4, h5, h6 {
+      font-family: Helvetica, sans-serif;
+    }
+
+    h1, h2, h3 {
+      font-family: Times New Roman, serif;
+      font-weight: normal;
+    }
+
+    h1 {
+      font-size: 1.8em;
+      font-weight: lighter;
+    }
+
+    h2 {
+      font-size: 1.4em;
+    }
+
+    h3 {
+      font-size: 1.2em;
+    }
+
+    h4, h5, h6 {
+      font-weight: bold;
+    }
+
+    h4 {
+      font-size: 1em;
+    }
+
+    h5 {
+      font-size: 0.8em;
+    }
+
+    h6 {
+      font-size: 0.6em;
+    }
+
+    #display {
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      width: 50%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: auto;
+    }
+
+    #output {
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      width: 100%;
+      margin: 0;
+      padding: 0 16px;
+    }
+
+    #input {
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      position: fixed;
+      top: 0px;
+      left: 50%;
+      width: 50%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #proforma {
+      display: none;
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+  <script src="epiceditor-0.2.2/js/epiceditor.min.js"></script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      "HTML-CSS": {
+        scale: 110
+      },
+      tex2jax: {
+        // removed "code" so markdown backtick kluge works
+        skipTags: ["script","noscript","style","textarea","pre"]
+      },
+      TeX: {
+        equationNumbers: {
+          // Default to standard AMS style numbering, rather than none at all
+          autoNumber: "AMS"
+        }
+      }
+    });
+  </script>
+  <script type="text/javascript" async
+          src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
+  </script>
+
+  <script>
+    var editor;
+    var filename = "scratch";
+
+    function setup() {
+      var opts = {
+        container: $("#input")[0],
+        basePath: "epiceditor-0.2.2",
+        localStorageName: "latex-scratchpad",
+        button: false
+      }
+      editor = new EpicEditor(opts).load();
+      editor.on("update", update);
+      editor.open(filename);
+      if (editor.exportFile().trim() == "") {
+        reset();
+      }
+      update();
+    }
+
+    function update() {
+      var output = $("#output");
+      output.empty();
+      output.html(editor.exportFile(null, 'html'));
+      MathJax.Hub.Queue(["Typeset", MathJax.Hub, output[0]]);
+    }
+
+    function reset() {
+      var proforma = $("#proforma");
+      editor.importFile(filename, proforma[0].value);
+    }
+
+    $().ready(setup);
+  </script>
+
+ </head>
+ <body>
+   <div id="display">
+     <!--div id="controls">
+       <input id="name" size="30">
+       <input type="button" id="save" value="save">
+     </div-->
+     <div id="output"></div>
+   </div>
+   <div id="input"></div>
+   <textarea id="proforma">`\(\LaTeX\)` Scratchpad v0.1
+============================
+
+Start typing here — on the right!
+
+ * Text is [Markdown](http://daringfireball.net/projects/markdown/) formatted
+ * Mathematics is `\(\LaTeX\)` formatted using [MathJax](http://www.mathjax.org/):
+   * Both inline: `\(\mathbb{P}(X \geq a) \leq \frac{\mathbb{E}(X)}{a}\)`
+   * And display: `\[\mathbb{P}(X \geq a) \leq \frac{\mathbb{E}(X)}{a}\]`
+ * Your prose is stored locally using HTML5 [Local Storage](http://diveintohtml5.info/storage.html), providing persistence across page loads (all care taken, no guarantee given)
+
+Notes, Caveats and Weasel-words
+-------------------------------
+
+ * A modern web browser is most certainly required
+ * Most AMS symbols should be supported
+ * `\(\LaTeX\)` macros are supported, left as an exercise for the reader
+ * For the moment, the maths environments should be wrapped in Markdown inline code blocks using backticks: \`
+ * This work is released under the [GNU AGPL v3](http://www.gnu.org/licenses/agpl.html)
+
+Apologies
+---------
+
+Please address all correspondence and diffs to: [Michael Gratton](http://mjog.vee.net) / @mjog
+
+</textarea>
+ </body>
+</html>
