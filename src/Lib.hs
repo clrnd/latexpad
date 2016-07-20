@@ -7,33 +7,39 @@ module Lib
 
 import Data.Aeson
 import Data.Aeson.TH
+import Data.Text
 import Network.Wai
 import Network.Wai.Handler.Warp
+import Network.Wai.Middleware.RequestLogger (logStdoutDev)
 import Servant
 
-data User = User
-  { userId        :: Int
-  , userFirstName :: String
-  , userLastName  :: String
+import Debug.Trace
+
+data Snippet = Snippet
+  { snippetContent :: Text
   } deriving (Eq, Show)
 
-$(deriveJSON defaultOptions ''User)
+$(deriveJSON defaultOptions ''Snippet)
 
-type API = "users" :> Get '[JSON] [User]
+data SnippetId = SnippetId
+  { snippetId :: Int
+  } deriving (Eq, Show)
 
-startApp :: IO ()
-startApp = run 8080 app
+$(deriveJSON defaultOptions ''SnippetId)
 
-app :: Application
-app = serve api server
+type API = "store" :> ReqBody '[JSON] Snippet :> Post '[JSON] SnippetId
+
+server :: Server API
+server = snippet
+  where
+    snippet :: Snippet -> Handler SnippetId
+    snippet s = traceShow s $ return (SnippetId 1)
 
 api :: Proxy API
 api = Proxy
 
-server :: Server API
-server = return users
+app :: Application
+app = serve api server
 
-users :: [User]
-users = [ User 1 "Isaac" "Newton"
-        , User 2 "Albert" "Einstein"
-        ]
+startApp :: IO ()
+startApp = run 8080 (logStdoutDev app)
