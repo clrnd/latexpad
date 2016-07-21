@@ -15,11 +15,18 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Lib
+  exposed-modules:     Lib, Store
   build-depends:       base >= 4.7 && < 5
                      , aeson
+                     , acid-state
+                     , bytestring
+                     , containers
+                     , cryptohash
+                     , mtl
+                     , safecopy
                      , servant-server
                      , text
+                     , transformers
                      , wai
                      , wai-extra
                      , warp
