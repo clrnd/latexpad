@@ -22,47 +22,9 @@
 
 <html>
  <head>
-  <title>LaTeX Scratch Pad</title>
-
+  <title>LaTeX Pad</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <style>
-    html, h4, h5, h6 {
-      font-family: Helvetica, sans-serif;
-    }
-
-    h1, h2, h3 {
-      font-family: Times New Roman, serif;
-      font-weight: normal;
-    }
-
-    h1 {
-      font-size: 1.8em;
-      font-weight: lighter;
-    }
-
-    h2 {
-      font-size: 1.4em;
-    }
-
-    h3 {
-      font-size: 1.2em;
-    }
-
-    h4, h5, h6 {
-      font-weight: bold;
-    }
-
-    h4 {
-      font-size: 1em;
-    }
-
-    h5 {
-      font-size: 0.8em;
-    }
-
-    h6 {
-      font-size: 0.6em;
-    }
-
     #display {
       position: fixed;
       top: 0px;
@@ -94,12 +56,21 @@
       padding: 0;
     }
 
+    #save {
+    }
+
+    #title {
+      margin-top: 0;
+      padding: 16px;
+    }
+
     #proforma {
       display: none;
     }
   </style>
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-  <script src="epiceditor-0.2.2/js/epiceditor.min.js"></script>
+  <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+  <script src="/epiceditor-0.2.2/js/epiceditor.min.js"></script>
 
   <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -118,22 +89,18 @@
       }
     });
   </script>
-  <script type="text/javascript" async
-          src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-  </script>
 
   <script>
     var editor;
     var filename = "scratch";
 
     function setup() {
-      var opts = {
+      editor = new EpicEditor({
         container: $("#input")[0],
         basePath: "epiceditor-0.2.2",
-        localStorageName: "latex-scratchpad",
+        clientSideStorage: false,
         button: false
-      }
-      editor = new EpicEditor(opts).load();
+      }).load();
       editor.on("update", update);
       editor.open(filename);
       if (editor.exportFile().trim() == "") {
@@ -157,41 +124,33 @@
     $().ready(setup);
   </script>
 
- </head>
- <body>
-   <div id="display">
-     <!--div id="controls">
-       <input id="name" size="30">
-       <input type="button" id="save" value="save">
-     </div-->
-     <div id="output"></div>
-   </div>
-   <div id="input"></div>
-   <textarea id="proforma">`\(\LaTeX\)` Scratchpad v0.1
-============================
+</head>
+<body>
+    <div id="display" class="col-xs-6">
+        <h1 id="title">
+            LaTeX Pad!
+            <button id="save" class="pull-right btn btn-primary">Save!</button>
+        </h1>
+        <div id="output"></div>
+    </div>
+    <div id="input" class="col-xs-6"></div>
+    <textarea id="proforma" class="hidden">
+* Type on the right, then click save to generate an URL.
+* Text is [Markdown](http://daringfireball.net/projects/markdown/) formatted
+* Mathematics is `\(\LaTeX\)` formatted using [MathJax](http://www.mathjax.org/):
 
-Start typing here — on the right!
+* This work is an extension of [Michael's Gratton Scratchpad](http://mjog.vee.net/latex-scratchpad/)
+and released under the [GNU AGPL v3](http://www.gnu.org/licenses/agpl.html)
 
- * Text is [Markdown](http://daringfireball.net/projects/markdown/) formatted
- * Mathematics is `\(\LaTeX\)` formatted using [MathJax](http://www.mathjax.org/):
-   * Both inline: `\(\mathbb{P}(X \geq a) \leq \frac{\mathbb{E}(X)}{a}\)`
-   * And display: `\[\mathbb{P}(X \geq a) \leq \frac{\mathbb{E}(X)}{a}\]`
- * Your prose is stored locally using HTML5 [Local Storage](http://diveintohtml5.info/storage.html), providing persistence across page loads (all care taken, no guarantee given)
-
-Notes, Caveats and Weasel-words
--------------------------------
-
- * A modern web browser is most certainly required
- * Most AMS symbols should be supported
- * `\(\LaTeX\)` macros are supported, left as an exercise for the reader
- * For the moment, the maths environments should be wrapped in Markdown inline code blocks using backticks: \`
- * This work is released under the [GNU AGPL v3](http://www.gnu.org/licenses/agpl.html)
-
-Apologies
----------
-
-Please address all correspondence and diffs to: [Michael Gratton](http://mjog.vee.net) / @mjog
-
+$$ \sum\limits_{i=1}^{n}{i^2} $$
 </textarea>
- </body>
+<script>
+$('body').on('click', '#save', function(ev){
+    console.log(ev)
+});
+$(window).on('popstate', function(ev){
+    console.log(ev);
+})
+</script>
+</body>
 </html>

@@ -3,8 +3,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators #-}
 module Lib
-    ( startApp
-    ) where
+  ( startApp
+  ) where
 
 import Data.Acid
 import Data.ByteString.Char8 (unpack)
@@ -17,7 +17,6 @@ import Network.Wai.Middleware.RequestLogger (logStdoutDev)
 import Servant
 import qualified Data.Text as Text
 import qualified Data.Map as Map
-
 
 import Store
 import Debug.Trace

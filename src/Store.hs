@@ -1,7 +1,13 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
-module Store where
+module Store
+  ( Snippet(Snippet)
+  , SnippetId(SnippetId)
+  , SnippetDb(SnippetDb)
+  , GetSnippet(GetSnippet)
+  , AddSnippet(AddSnippet)
+  ) where
 
 import Control.Monad.Reader (ask)
 import Control.Monad.State (modify)
