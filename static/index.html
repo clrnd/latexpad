@@ -56,9 +56,6 @@
       padding: 0;
     }
 
-    #save {
-    }
-
     #title {
       margin-top: 0;
       padding: 16px;
@@ -69,6 +66,7 @@
     }
   </style>
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
   <script src="/epiceditor-0.2.2/js/epiceditor.min.js"></script>
 
@@ -91,37 +89,6 @@
   </script>
 
   <script>
-    var editor;
-    var filename = "scratch";
-
-    function setup() {
-      editor = new EpicEditor({
-        container: $("#input")[0],
-        basePath: "epiceditor-0.2.2",
-        clientSideStorage: false,
-        button: false
-      }).load();
-      editor.on("update", update);
-      editor.open(filename);
-      if (editor.exportFile().trim() == "") {
-        reset();
-      }
-      update();
-    }
-
-    function update() {
-      var output = $("#output");
-      output.empty();
-      output.html(editor.exportFile(null, 'html'));
-      MathJax.Hub.Queue(["Typeset", MathJax.Hub, output[0]]);
-    }
-
-    function reset() {
-      var proforma = $("#proforma");
-      editor.importFile(filename, proforma[0].value);
-    }
-
-    $().ready(setup);
   </script>
 
 </head>
@@ -129,7 +96,10 @@
     <div id="display" class="col-xs-6">
         <h1 id="title">
             LaTeX Pad!
-            <button id="save" class="pull-right btn btn-primary">Save!</button>
+            <button id="save" class="pull-right btn btn-primary"
+                    data-toggle="tooltip" data-placement="left"
+                    data-trigger="manual"
+                    title="The URL has been copied!">Save!</button>
         </h1>
         <div id="output"></div>
     </div>
@@ -145,8 +115,45 @@ and released under the [GNU AGPL v3](http://www.gnu.org/licenses/agpl.html)
 $$ \sum\limits_{i=1}^{n}{i^2} $$
 </textarea>
 <script>
+var editor;
+var filename = "scratch";
+
+function setup() {
+  editor = new EpicEditor({
+    container: $("#input")[0],
+    basePath: "epiceditor-0.2.2",
+    clientSideStorage: false,
+    button: false
+  }).load();
+  editor.on("update", update);
+  editor.open(filename);
+  if (editor.exportFile().trim() == "") {
+    reset();
+  }
+  update();
+}
+
+function update() {
+  var output = $("#output");
+  output.empty();
+  output.html(editor.exportFile(null, 'html'));
+  MathJax.Hub.Queue(["Typeset", MathJax.Hub, output[0]]);
+}
+
+function reset() {
+  var proforma = $("#proforma");
+  editor.importFile(filename, proforma[0].value);
+}
+
+setup();
+
+$('[data-toggle="tooltip"]').tooltip();
+
 $('body').on('click', '#save', function(ev){
-    console.log(ev)
+    $(ev.target).tooltip('show');
+    setTimeout(() => {
+        $(ev.target).tooltip('hide');
+    }, 1000);
 });
 $(window).on('popstate', function(ev){
     console.log(ev);
