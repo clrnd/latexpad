@@ -21,14 +21,15 @@ import qualified Data.Map as Map
 import Store
 import Debug.Trace
 
-type API = "store" :> ReqBody '[JSON] Snippet :> Post '[JSON] SnippetId
-      :<|> "get" :> Capture "id" String :> Get '[JSON] Snippet
+type API = "save" :> ReqBody '[JSON] Snippet :> Post '[JSON] SnippetId
+      :<|> "load" :> Capture "id" String :> Get '[JSON] Snippet
+      :<|> "static" :> Raw
 
 server :: Server API
-server = snippet :<|> get
+server = save :<|> load :<|> serveDirectory "static"
   where
-    snippet :: Snippet -> Handler SnippetId
-    snippet (Snippet s) = do
+    save :: Snippet -> Handler SnippetId
+    save (Snippet s) = do
         let bytes = encodeUtf8 s
         let hex = digestToHexByteString (hash bytes :: Digest MD5)
         let sid = SnippetId . unpack $ hex
@@ -39,8 +40,8 @@ server = snippet :<|> get
             return sid
         return sid
 
-    get :: String -> Handler Snippet
-    get ss = do
+    load :: String -> Handler Snippet
+    load ss = do
         liftIO $ do
             state <- openLocalState (SnippetDb Map.empty)
             snip <- query state (GetSnippet $ SnippetId ss) >>= \case

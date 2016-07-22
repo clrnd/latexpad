@@ -64,11 +64,16 @@
     #proforma {
       display: none;
     }
+
+    #copy {
+      margin-left: 1em;
+    }
   </style>
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
-  <script src="/epiceditor-0.2.2/js/epiceditor.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.12/clipboard.min.js"></script>
+  <script src="/static/epiceditor-0.2.2/js/epiceditor.min.js"></script>
 
   <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -88,29 +93,28 @@
     });
   </script>
 
-  <script>
-  </script>
-
 </head>
 <body>
-    <div id="display" class="col-xs-6">
+    <div id="display">
         <h1 id="title">
             LaTeX Pad!
+            <button id="copy" class="pull-right btn btn-default"
+                    disabled="disabled">Copy</button>
             <button id="save" class="pull-right btn btn-primary"
                     data-toggle="tooltip" data-placement="left"
                     data-trigger="manual"
-                    title="The URL has been copied!">Save!</button>
+                    title="The URL can now be copied!">Save!</button>
         </h1>
         <div id="output"></div>
     </div>
-    <div id="input" class="col-xs-6"></div>
+    <div id="input"></div>
     <textarea id="proforma" class="hidden">
-* Type on the right, then click save to generate an URL.
+* Type on the right, then click `save` to generate an URL
 * Text is [Markdown](http://daringfireball.net/projects/markdown/) formatted
-* Mathematics is `\(\LaTeX\)` formatted using [MathJax](http://www.mathjax.org/):
+* Mathematics is `\(\LaTeX\)` formatted using [MathJax](http://www.mathjax.org/)
 
-* This work is an extension of [Michael's Gratton Scratchpad](http://mjog.vee.net/latex-scratchpad/)
-and released under the [GNU AGPL v3](http://www.gnu.org/licenses/agpl.html)
+* This work is based on [Michael Gratton's Scratchpad](http://mjog.vee.net/latex-scratchpad/)
+and is released under the [GNU AGPL v3](http://www.gnu.org/licenses/agpl.html)
 
 $$ \sum\limits_{i=1}^{n}{i^2} $$
 </textarea>
@@ -147,14 +151,40 @@ function reset() {
 
 setup();
 
+let clipboard = new Clipboard('#copy', { text: () => window.location.href });
+
 $('[data-toggle="tooltip"]').tooltip();
 
 $('body').on('click', '#save', function(ev){
+    // show tooltip
     $(ev.target).tooltip('show');
     setTimeout(() => {
         $(ev.target).tooltip('hide');
     }, 1000);
+
+    // post to get hash, and set it as History
+    let data = {'snippetContent': editor.exportFile()};
+    $.ajax({
+        url: '/save',
+        type: 'POST',
+        data: JSON.stringify(data),
+        contentType: "application/json; charset=utf-8",
+        dataType: 'json',
+    }).done(saveDone).error(saveError);
 });
+
+function saveDone(sid){
+    // set hash
+    window.location.hash = sid.snippetId;
+
+    // enable copy
+    $('#copy').attr('disabled', false)
+}
+
+function saveError(err){
+    console.log(err);
+}
+
 $(window).on('popstate', function(ev){
     console.log(ev);
 })
