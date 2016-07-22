@@ -35,7 +35,7 @@ loadHash();
 function loadHash(){
     if (window.location.hash !== '') {
         let sid = window.location.hash.slice(1);
-        $.getJSON('/load/' + sid).done((data) =>
+        $.getJSON('/api/load/' + sid).done((data) =>
             editor.importFile(null, data.snippetContent))
     } else {
         reset();
@@ -64,7 +64,7 @@ $('#save').on('click', (ev) => {
     // post to get hash, and set it as History
     let data = {'snippetContent': editor.exportFile()};
     $.ajax({
-        url: '/save',
+        url: '/api/save',
         type: 'POST',
         data: JSON.stringify(data),
         contentType: "application/json; charset=utf-8",

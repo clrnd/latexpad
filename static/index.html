@@ -28,7 +28,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.12/clipboard.min.js"></script>
-  <script src="/epiceditor-0.2.2/js/epiceditor.min.js"></script>
+  <script src="epiceditor-0.2.2/js/epiceditor.min.js"></script>
 
   <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -81,6 +81,7 @@
     }
 
     #title {
+      color: #ccc;
       margin-top: 0;
       padding: 16px;
     }
@@ -93,7 +94,7 @@
 <body>
     <div id="display">
         <h1 id="title">
-            LaTeX Pad!
+            LaTeXpad
             <button id="copy" class="pull-right btn btn-default"
                     data-toggle="tooltip" data-placement="bottom"
                     data-trigger="manual"
@@ -118,6 +119,6 @@
 * Made by [Ezequiel Alvarez](github.com/alvare/latexpad) with [Servant](http://haskell-servant.readthedocs.io/)
 
 $$ \sum\limits_{i=1}^{n}{i^2} $$</textarea>
-    <script src="/main.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
