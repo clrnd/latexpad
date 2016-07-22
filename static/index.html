@@ -85,12 +85,8 @@
       padding: 16px;
     }
 
-    #proforma {
-      display: none;
-    }
-
     #copy {
-      margin-left: 1em;
+      margin-left: 0.5em;
     }
   </style>
 </head>
@@ -99,11 +95,14 @@
         <h1 id="title">
             LaTeX Pad!
             <button id="copy" class="pull-right btn btn-default"
-                    disabled="disabled">Copy</button>
+                    data-toggle="tooltip" data-placement="bottom"
+                    data-trigger="manual"
+                    title="Copied URL to clipboard!">Share</button>
             <button id="save" class="pull-right btn btn-primary"
                     data-toggle="tooltip" data-placement="left"
                     data-trigger="manual"
-                    title="The URL can now be copied!">Save!</button>
+                    data-loading-text="Saving..." 
+                    title="Saved succesfully!">Save!</button>
         </h1>
         <div id="output"></div>
     </div>
@@ -113,11 +112,13 @@
 * Text is [Markdown](http://daringfireball.net/projects/markdown/) formatted
 * Mathematics is `\(\LaTeX\)` formatted using [MathJax](http://www.mathjax.org/)
 
-* This work is based on [Michael Gratton's Scratchpad](http://mjog.vee.net/latex-scratchpad/)
-and is released under the [GNU AGPL v3](http://www.gnu.org/licenses/agpl.html)
+---
 
-$$ \sum\limits_{i=1}^{n}{i^2} $$
-</textarea>
-<script src="/main.js"></script>
+* Based on [Michael Gratton's Scratchpad](http://mjog.vee.net/latex-scratchpad/),
+released under the [GNU AGPL v3](http://www.gnu.org/licenses/agpl.html)
+* Made by [Ezequiel Alvarez](github.com/alvare/latexpad) with [Servant](http://haskell-servant.readthedocs.io/)
+
+$$ \sum\limits_{i=1}^{n}{i^2} $$</textarea>
+    <script src="/main.js"></script>
 </body>
 </html>
