@@ -21,9 +21,33 @@
 -->
 
 <html>
- <head>
+<head>
   <title>LaTeX Pad</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.12/clipboard.min.js"></script>
+  <script src="/epiceditor-0.2.2/js/epiceditor.min.js"></script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      "HTML-CSS": {
+        scale: 110
+      },
+      tex2jax: {
+        // removed "code" so markdown backtick kluge works
+        skipTags: ["script","noscript","style","textarea","pre"]
+      },
+      TeX: {
+        equationNumbers: {
+          // Default to standard AMS style numbering, rather than none at all
+          autoNumber: "AMS"
+        }
+      }
+    });
+  </script>
+
   <style>
     #display {
       position: fixed;
@@ -69,30 +93,6 @@
       margin-left: 1em;
     }
   </style>
-  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.12/clipboard.min.js"></script>
-  <script src="/static/epiceditor-0.2.2/js/epiceditor.min.js"></script>
-
-  <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      "HTML-CSS": {
-        scale: 110
-      },
-      tex2jax: {
-        // removed "code" so markdown backtick kluge works
-        skipTags: ["script","noscript","style","textarea","pre"]
-      },
-      TeX: {
-        equationNumbers: {
-          // Default to standard AMS style numbering, rather than none at all
-          autoNumber: "AMS"
-        }
-      }
-    });
-  </script>
-
 </head>
 <body>
     <div id="display">
@@ -118,76 +118,6 @@ and is released under the [GNU AGPL v3](http://www.gnu.org/licenses/agpl.html)
 
 $$ \sum\limits_{i=1}^{n}{i^2} $$
 </textarea>
-<script>
-var editor;
-var filename = "scratch";
-
-function setup() {
-  editor = new EpicEditor({
-    container: $("#input")[0],
-    basePath: "epiceditor-0.2.2",
-    clientSideStorage: false,
-    button: false
-  }).load();
-  editor.on("update", update);
-  editor.open(filename);
-  if (editor.exportFile().trim() == "") {
-    reset();
-  }
-  update();
-}
-
-function update() {
-  var output = $("#output");
-  output.empty();
-  output.html(editor.exportFile(null, 'html'));
-  MathJax.Hub.Queue(["Typeset", MathJax.Hub, output[0]]);
-}
-
-function reset() {
-  var proforma = $("#proforma");
-  editor.importFile(filename, proforma[0].value);
-}
-
-setup();
-
-let clipboard = new Clipboard('#copy', { text: () => window.location.href });
-
-$('[data-toggle="tooltip"]').tooltip();
-
-$('body').on('click', '#save', function(ev){
-    // show tooltip
-    $(ev.target).tooltip('show');
-    setTimeout(() => {
-        $(ev.target).tooltip('hide');
-    }, 1000);
-
-    // post to get hash, and set it as History
-    let data = {'snippetContent': editor.exportFile()};
-    $.ajax({
-        url: '/save',
-        type: 'POST',
-        data: JSON.stringify(data),
-        contentType: "application/json; charset=utf-8",
-        dataType: 'json',
-    }).done(saveDone).error(saveError);
-});
-
-function saveDone(sid){
-    // set hash
-    window.location.hash = sid.snippetId;
-
-    // enable copy
-    $('#copy').attr('disabled', false)
-}
-
-function saveError(err){
-    console.log(err);
-}
-
-$(window).on('popstate', function(ev){
-    console.log(ev);
-})
-</script>
+<script src="/main.js"></script>
 </body>
 </html>
