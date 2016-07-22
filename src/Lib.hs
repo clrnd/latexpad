@@ -21,8 +21,10 @@ import qualified Data.Map as Map
 import Store
 import Debug.Trace
 
-type API = "save" :> ReqBody '[JSON] Snippet :> Post '[JSON] SnippetId
-      :<|> "load" :> Capture "id" String :> Get '[JSON] Snippet
+type API = "api" :> (
+         "save" :> ReqBody '[JSON] Snippet :> Post '[JSON] SnippetId
+    :<|> "load" :> Capture "id" String :> Get '[JSON] Snippet
+    )
 
 server :: Server API
 server = save :<|> load
