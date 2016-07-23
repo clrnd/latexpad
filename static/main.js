@@ -2,31 +2,26 @@
 
 /* Editor Stuff */
 var filename = "scratch";
-var editor = setup();
 
-function setup() {
-  let editor = new EpicEditor({
-    container: $("#input")[0],
-    basePath: "epiceditor-0.2.2",
-    clientSideStorage: false,
-    button: false
-  }).load();
+var update = _.debounce(function(){
+    var $output = $("#output");
+    $output.empty();
+    $output.html(editor.exportFile(null, 'html'));
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, output[0]]);
+}, 500, { 'leading': true, 'trailing': true });
 
-  editor.on("update", update);
+let editor = new EpicEditor({
+        container: $("#input")[0],
+        basePath: "epiceditor-0.2.2",
+        clientSideStorage: false,
+        button: false
+    })
+    .load()
+    .on("update", update);
 
-  return editor;
-}
-
-function update() {
-  var output = $("#output");
-  output.empty();
-  output.html(editor.exportFile(null, 'html'));
-  MathJax.Hub.Queue(["Typeset", MathJax.Hub, output[0]]);
-}
-
-function reset() {
-  var proforma = $("#proforma");
-  editor.importFile(null, proforma[0].value);
+function reset(){
+    var proforma = $("#proforma").val();
+    editor.importFile(null, proforma);
 }
 
 /* Store Stuff */
