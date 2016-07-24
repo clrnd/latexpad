@@ -24,10 +24,10 @@ import Debug.Trace
 type API = "api" :> (
          "save" :> ReqBody '[JSON] Snippet :> Post '[JSON] SnippetId
     :<|> "load" :> Capture "id" String :> Get '[JSON] Snippet
-    )
+    ) :<|> Raw
 
 server :: Server API
-server = save :<|> load
+server = (save :<|> load) :<|> serveDirectory "static"
   where
     save :: Snippet -> Handler SnippetId
     save (Snippet s) = do

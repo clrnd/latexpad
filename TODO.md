@@ -6,3 +6,4 @@ TODO
 * matrix?
 * api throttle?
 * share button disable?
+* api on error
