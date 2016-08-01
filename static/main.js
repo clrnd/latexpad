@@ -1,4 +1,4 @@
-// "use strict";
+"use strict";
 
 /* Editor Stuff */
 var filename = "scratch";

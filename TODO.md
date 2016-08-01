@@ -7,3 +7,4 @@ TODO
 * api throttle?
 * share button disable?
 * api on error
+* save triggers load
