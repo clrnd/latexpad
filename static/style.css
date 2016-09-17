@@ -1,0 +1,42 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 40px;
+}
+
+#footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 40px;
+    background-color: #f5f5f5;
+}
+
+#footer p {
+    line-height: 40px;
+    margin: 0;
+}
+
+#input {
+    min-height: 200px;
+}
+
+#output {
+    padding: 0 1em;
+}
+
+#title .home,
+#title .home:hover {
+    color: #777;
+    margin: 0;
+    padding: 16px;
+    text-decoration: none;
+}
+
+#title .share {
+    color: #337ab7;
+    font-size: 40%;
+}

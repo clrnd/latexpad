@@ -1,26 +1,31 @@
 "use strict";
 
-/* Editor Stuff */
-var filename = "scratch";
 
-var update = _.debounce(function(){
-    var $output = $("#output");
+let $share = $('#share-link');
+let $output = $('#output');
+
+/* Editor Stuff */
+let update = _.debounce(function(){
+    $share.empty();
+
     $output.empty();
     $output.html(editor.exportFile(null, 'html'));
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub, output[0]]);
-}, 500, { 'leading': true, 'trailing': true });
+
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, output[0]]);
+}, 800, { 'leading': false, 'trailing': true });
 
 let editor = new EpicEditor({
-        container: $("#input")[0],
-        basePath: "epiceditor-0.2.2",
+        container: $('#input').get(0),
+        basePath: 'epiceditor-0.2.2',
         clientSideStorage: false,
-        button: false
+        button: false,
+        autogrow: true
     })
     .load()
     .on("update", update);
 
 function reset(){
-    var proforma = $("#proforma").val();
+    let proforma = $("#proforma").val();
     editor.importFile(null, proforma);
 }
 
@@ -37,22 +42,11 @@ function loadHash(){
     }
 }
 
-let clipboard = new Clipboard('#copy', { text: () => window.location.href })
-    .on('success', function(e) {
-        $(e.trigger).tooltip('show');
-        setTimeout(() => {
-            $(e.trigger).tooltip('hide');
-        }, 1000);
-    });
-
-$('[data-toggle="tooltip"]').tooltip();
-
 $(window).on('popstate', function(ev){
     loadHash();
 });
 
 $('#save').on('click', (ev) => {
-    // show tooltip
     let $btn = $(ev.target);
     $btn.button('loading');
 
@@ -66,11 +60,8 @@ $('#save').on('click', (ev) => {
         dataType: 'json',
     }).done((sid) => {
         window.location.hash = sid.snippetId;
-
-        $btn.tooltip('show');
-        setTimeout(() => {
-            $btn.tooltip('hide');
-        }, 1000);
+        $share.html(`<a class="share" href="${window.location}">
+                         Saved! Share using this link.</a>`);
     }).fail((err) => {
         console.log(err);
     }).always(() => $btn.button('reset'));

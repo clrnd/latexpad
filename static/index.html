@@ -20,15 +20,35 @@
 
 -->
 
+<!--
+
+  LaTeX Pad
+  Copyright (C) 2016 Ezequiel Angel Alvarez <welcometothechango@gmail.com>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+
 <html>
 <head>
   <title>LaTeX Pad</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/style.css">
   <script src="https://cdn.jsdelivr.net/lodash/4.13.1/lodash.min.js"></script>
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.12/clipboard.min.js"></script>
   <script src="epiceditor-0.2.2/js/epiceditor.min.js"></script>
 
   <script type="text/x-mathjax-config">
@@ -48,67 +68,32 @@
       }
     });
   </script>
-
-  <style>
-    #display {
-      position: fixed;
-      top: 0px;
-      left: 0px;
-      width: 50%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: auto;
-    }
-
-    #output {
-      -webkit-box-sizing: border-box;
-      box-sizing: border-box;
-      width: 100%;
-      margin: 0;
-      padding: 16px;
-    }
-
-    #input {
-      -webkit-box-sizing: border-box;
-      box-sizing: border-box;
-      position: fixed;
-      top: 0px;
-      left: 50%;
-      width: 50%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-
-    #title {
-      color: #555;
-      margin: 0;
-      padding: 16px;
-    }
-
-    #copy {
-      margin-left: 0.5em;
-    }
-  </style>
 </head>
 <body>
-    <div id="display">
-        <h1 class="page-header" id="title">
-            LaTeXpad
-            <button id="copy" class="pull-right btn btn-default"
-                    data-toggle="tooltip" data-placement="bottom"
-                    data-trigger="manual"
-                    title="Copied URL to clipboard!">Share</button>
-            <button id="save" class="pull-right btn btn-primary"
-                    data-toggle="tooltip" data-placement="left"
-                    data-trigger="manual"
-                    data-loading-text="Saving..." 
-                    title="Saved succesfully!">Save!</button>
-        </h1>
-        <div id="output"></div>
+    <h1 class="page-header" id="title">
+        <a class="home" href="/">LaTeX Pad</a>
+        <button id="save" class="btn btn-primary"
+                data-loading-text="Saving...">
+            Save</button>
+        <span id="share-link"></span>
+    </h1>
+
+    <div class="row">
+        <div class="split-panel col-md-6">
+            <div id="output"></div>
+        </div>
+        <div class="split-panel col-md-6">
+            <div id="input"></div>
+        </div>
     </div>
-    <div id="input"></div>
+
+    <footer id="footer">
+        <div class="container">
+            <p class="text-muted">Made with ❤︎ by <a href="http://clrnd.com.ar">@clrnd</a>. Source on <a href="http://github.com/alvare/latexpad">GitHub</a>.
+            </p>
+        </div>
+    </footer>
+
     <textarea id="proforma" class="hidden">
 * Type on the right, then click `save` to generate an URL
 * Text is [Markdown](http://daringfireball.net/projects/markdown/) formatted
@@ -119,7 +104,9 @@
 * Based on [Michael Gratton's Scratchpad](http://mjog.vee.net/latex-scratchpad/)
 * Made by [Ezequiel Alvarez](github.com/alvare/latexpad) with [Servant](http://haskell-servant.readthedocs.io/)
 
-$$ \sum\limits_{i=1}^{n}{i^2} $$</textarea>
-    <script src="main.js"></script>
+$$ \sum\limits_{i=1}^{n}{i^2} $$
+    </textarea>
+
+    <script src="/main.js"></script>
 </body>
 </html>
