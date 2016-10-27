@@ -1,6 +1,5 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators #-}
 module Lib
   ( startApp
@@ -19,11 +18,10 @@ import qualified Data.Text as Text
 import qualified Data.Map as Map
 
 import Store
-import Debug.Trace
 
 type API = "api" :> (
-         "save" :> ReqBody '[JSON] Snippet :> Post '[JSON] SnippetId
-    :<|> "load" :> Capture "id" String :> Get '[JSON] Snippet
+             "save" :> ReqBody '[JSON] Snippet :> Post '[JSON] SnippetId
+        :<|> "load" :> Capture "id" String :> Get '[JSON] Snippet
     ) :<|> Raw
 
 server :: Server API
@@ -34,12 +32,11 @@ server = (save :<|> load) :<|> serveDirectory "static"
         let bytes = encodeUtf8 s
         let hex = digestToHexByteString (hash bytes :: Digest MD5)
         let sid = SnippetId . unpack $ hex
-        sid <- liftIO $ do
+        liftIO $ do
             state <- openLocalState (SnippetDb Map.empty)
             update state (AddSnippet sid $ Snippet s)
             closeAcidState state
             return sid
-        return sid
 
     load :: String -> Handler Snippet
     load ss = do
@@ -57,5 +54,5 @@ api = Proxy
 app :: Application
 app = serve api server
 
-startApp :: IO ()
-startApp = run 8080 (logStdoutDev app)
+startApp :: Int -> IO ()
+startApp port = run port (logStdoutDev app)
