@@ -2,26 +2,6 @@
 
 <!--
 
-  LaTeX Scratchpad - A web mashup thingo for people with busy maths needs.
-  Copyright (C) 2013 Michael James Gratton <mike@vee.net>
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU Affero General Public License for more details.
-
-  You should have received a copy of the GNU Affero General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
--->
-
-<!--
-
   LaTeX Pad
   Copyright (C) 2016 Ezequiel Angel Alvarez <welcometothechango@gmail.com>
 
@@ -42,32 +22,29 @@
 
 <html>
 <head>
-  <title>LaTeX Pad</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/style.css">
-  <script src="https://cdn.jsdelivr.net/lodash/4.13.1/lodash.min.js"></script>
-  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
-  <script src="epiceditor-0.2.2/js/epiceditor.min.js"></script>
-
-  <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      "HTML-CSS": {
-        scale: 110
-      },
-      tex2jax: {
-        // removed "code" so markdown backtick kluge works
-        skipTags: ["script","noscript","style","textarea","pre"]
-      },
-      TeX: {
-        equationNumbers: {
-          // Default to standard AMS style numbering, rather than none at all
-          autoNumber: "AMS"
-        }
-      }
-    });
-  </script>
+    <title>LaTeX Pad</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css" />
+    <link rel="stylesheet" href="style.css">
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            "HTML-CSS": {
+                scale: 110
+            },
+            showProcessingMessages: false,
+            tex2jax: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            TeX: {
+                equationNumbers: { autoNumber: "AMS" }
+            }
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="epiceditor-0.2.2/js/epiceditor.min.js"></script>
 </head>
 <body>
     <h1 class="page-header" id="title">
@@ -75,15 +52,17 @@
         <button id="save" class="btn btn-primary"
                 data-loading-text="Saving...">
             Save</button>
-        <span id="share-link"></span>
+        <span id="share-link" class="message"></span>
+        <span id="error" class="message text-danger"></span>
     </h1>
 
 <div class="container">
     <div class="row">
-        <div class="split-panel col-md-6">
-            <div id="output"></div>
+        <div class="col-md-6">
+            <div class="output" id="math-preview"></div>
+            <div class="output" id="math-buffer"></div>
         </div>
-        <div class="split-panel col-md-6">
+        <div class="col-md-6">
             <div id="input"></div>
         </div>
     </div>
@@ -97,18 +76,18 @@
     </footer>
 
     <textarea id="proforma" class="hidden">
-* Type on the right, then click `save` to generate an URL
+* Type on the right, then click `Save` to generate an URL
 * Text is [Markdown](http://daringfireball.net/projects/markdown/) formatted
-* Mathematics is `\(\LaTeX\)` formatted using [MathJax](http://www.mathjax.org/)
+* Mathematics is $ \LaTeX $ formatted using [MathJax](http://www.mathjax.org/)
+
+$$ \sum\limits_{i=1}^{n}{i^2} $$
 
 ---
 
-* Based on [Michael Gratton's Scratchpad](http://mjog.vee.net/latex-scratchpad/)
-* Made by [Ezequiel Alvarez](github.com/alvare/latexpad) with [Servant](http://haskell-servant.readthedocs.io/)
-
-$$ \sum\limits_{i=1}^{n}{i^2} $$
+Based on the works of [@mjog](http://mjog.vee.net/latex-scratchpad/) and [@kerzol](https://github.com/kerzol/markdown-mathjax)
     </textarea>
 
-    <script src="/main.js"></script>
+    <script src="marked-mathjax.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>

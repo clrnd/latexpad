@@ -25,8 +25,9 @@ body {
     margin-top: -20px;
 }
 
-#output {
+.output {
     padding: 0 1em;
+    top: 0;
 }
 
 #title .home,
@@ -37,7 +38,6 @@ body {
     text-decoration: none;
 }
 
-#title .share {
-    color: #337ab7;
+#title .message {
     font-size: 40%;
 }

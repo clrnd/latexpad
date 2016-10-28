@@ -1,18 +1,16 @@
 "use strict";
 
-
 let $share = $('#share-link');
+let $error = $('#error');
 let $output = $('#output');
 
 /* Editor Stuff */
-let update = _.debounce(function(){
+function update(){
     $share.empty();
+    $error.empty();
 
-    $output.empty();
-    $output.html(editor.exportFile(null, 'html'));
-
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, output[0]]);
-}, 800, { 'leading': false, 'trailing': true });
+    Preview.Update();
+}
 
 let editor = new EpicEditor({
         container: $('#input').get(0),
@@ -29,14 +27,22 @@ function reset(){
     editor.importFile(null, proforma);
 }
 
+Preview.Init(editor);
+
 /* Store Stuff */
-loadHash();
+
+let showError = (err) => $error.html(`Error: ${err.responseText}`);
 
 function loadHash(){
     if (window.location.hash !== '') {
         let sid = window.location.hash.slice(1);
-        $.getJSON('/api/load/' + sid).done((data) =>
-            editor.importFile(null, data.snippetContent))
+
+        NProgress.start();
+        $.getJSON(`/api/load/${sid}`)
+            .done((data) =>
+                editor.importFile(null, data.snippetContent))
+            .fail(showError)
+            .always(() => NProgress.done());
     } else {
         reset();
     }
@@ -49,9 +55,12 @@ $(window).on('popstate', function(ev){
 $('#save').on('click', (ev) => {
     let $btn = $(ev.target);
     $btn.button('loading');
+    $share.empty();
+    $error.empty();
 
     // post to get hash, and set it as History
     let data = {'snippetContent': editor.exportFile()};
+    NProgress.start();
     $.ajax({
         url: '/api/save',
         type: 'POST',
@@ -59,10 +68,15 @@ $('#save').on('click', (ev) => {
         contentType: "application/json; charset=utf-8",
         dataType: 'json',
     }).done((sid) => {
-        window.location.hash = sid.snippetId;
-        $share.html(`<a class="share" href="${window.location}">
+        history.pushState({}, document.title, '#' + sid.snippetId);
+        $share.html(`<a href="${window.location}">
                          Saved! Share using this link.</a>`);
-    }).fail((err) => {
-        console.log(err);
-    }).always(() => $btn.button('reset'));
+    }).fail(
+        showError
+    ).always(() => {
+        $btn.button('reset');
+        NProgress.done();
+    });
 });
+
+loadHash();
