@@ -41,3 +41,9 @@ body {
 #title .message {
     font-size: 40%;
 }
+
+#title .message a,
+#title .message span {
+    display: inline-block;
+    margin: 0 16px;
+}

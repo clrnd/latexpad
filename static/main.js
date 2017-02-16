@@ -1,13 +1,12 @@
 "use strict";
 
-let $share = $('#share-link');
-let $error = $('#error');
+let $msg = $('#message');
 let $output = $('#output');
+let default_error = "Something went ups";
 
 /* Editor Stuff */
 function update(){
-    $share.empty();
-    $error.empty();
+    $msg.empty();
 
     Preview.Update();
 }
@@ -31,7 +30,8 @@ Preview.Init(editor);
 
 /* Store Stuff */
 
-let showError = (err) => $error.html(`Error: ${err.responseText}`);
+let showError = (err) => $msg.html(`<span class="text-danger">
+    Error: ${err.responseText || err.statusText || default_error}</span>`);
 
 function loadHash(){
     if (window.location.hash !== '') {
@@ -55,8 +55,7 @@ $(window).on('popstate', function(ev){
 $('#save').on('click', (ev) => {
     let $btn = $(ev.target);
     $btn.button('loading');
-    $share.empty();
-    $error.empty();
+    $msg.empty();
 
     // post to get hash, and set it as History
     let data = {'snippetContent': editor.exportFile()};
@@ -69,7 +68,7 @@ $('#save').on('click', (ev) => {
         dataType: 'json',
     }).done((sid) => {
         history.pushState({}, document.title, '#' + sid.snippetId);
-        $share.html(`<a href="${window.location}">
+        $msg.html(`<a href="${window.location}">
                          Saved! Share using this link.</a>`);
     }).fail(
         showError
