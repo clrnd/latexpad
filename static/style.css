@@ -21,7 +21,7 @@ body {
 }
 
 #input {
-    min-height: 200px;
+    min-height: 400px;
 }
 
 @media (min-width: 992px){
