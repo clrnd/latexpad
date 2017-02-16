@@ -22,7 +22,12 @@ body {
 
 #input {
     min-height: 200px;
-    margin-top: -20px;
+}
+
+@media (min-width: 992px){
+    #input {
+        margin-top: -20px;
+    }
 }
 
 .output {
