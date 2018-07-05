@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     API, App, Store
+  exposed-modules:     API, App, Store, Types
   ghc-options:         -Wall
   build-depends:       base >= 4.7 && < 5
                      , aeson
@@ -45,10 +45,11 @@ executable latexpad-swagger
   main-is:             Swagger.hs
   ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
-                     , bytestring
-                     , aeson-pretty
+                     , aeson
+                     , neat-interpolation
                      , servant-swagger
                      , swagger2
+                     , text
                      , latexpad
   default-language:    Haskell2010
 
