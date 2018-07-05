@@ -1,6 +1,12 @@
 module Main where
 
-import Lib
+import Network.Wai.Handler.Warp (run)
+import Network.Wai.Middleware.RequestLogger (logStdoutDev)
+
+import App
+
+startApp :: Int -> IO ()
+startApp port = run port (logStdoutDev app)
 
 main :: IO ()
 main = do

@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 module Store
@@ -9,28 +10,29 @@ module Store
   , AddSnippet(AddSnippet)
   ) where
 
+import GHC.Generics
 import Control.Monad.Reader (ask)
 import Control.Monad.State (modify)
 import Data.Aeson
-import Data.Aeson.TH
 import Data.Acid
 import Data.Map (Map)
-import Data.SafeCopy
+import Data.SafeCopy (base, deriveSafeCopy)
 import Data.Typeable
 import Data.Text (Text)
 import qualified Data.Map as Map
 
 newtype SnippetId = SnippetId
   { snippetId :: String
-  } deriving (Eq, Show)
+  } deriving (Eq, Show, Generic)
 
-$(deriveJSON defaultOptions ''SnippetId)
+instance ToJSON SnippetId
 
 newtype Snippet = Snippet
   { snippetContent :: Text
-  } deriving (Eq, Show, Typeable)
+  } deriving (Eq, Show, Typeable, Generic)
 
-$(deriveJSON defaultOptions ''Snippet)
+instance ToJSON Snippet
+instance FromJSON Snippet
 
 newtype SnippetDb = SnippetDb
     { allSnippets :: Map String Snippet
