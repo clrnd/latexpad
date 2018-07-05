@@ -6,7 +6,7 @@ module API
 
 import Servant
 
-import Store
+import Types
 
 type SnippetAPI =
          "save" :> ReqBody '[JSON] Snippet :> Post '[JSON] SnippetId

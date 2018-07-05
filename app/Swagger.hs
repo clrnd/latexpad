@@ -6,7 +6,7 @@ import Servant.Swagger
 import qualified Data.ByteString.Lazy.Char8 as BL8
 
 import App
-import Store
+import Types
 
 instance ToSchema Snippet
 instance ToSchema SnippetId

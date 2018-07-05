@@ -15,6 +15,7 @@ import qualified Data.Map as Map
 
 import API
 import Store
+import Types
 
 server :: Server API
 server = (save :<|> load) :<|> serveDirectoryFileServer "static"

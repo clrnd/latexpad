@@ -7,7 +7,7 @@ import Data.Text (pack)
 import Test.QuickCheck
 
 import App
-import Store
+import Types
 
 instance Arbitrary Snippet where
     arbitrary = Snippet . pack <$> arbitrary
