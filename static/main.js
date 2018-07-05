@@ -31,7 +31,7 @@ Preview.Init(editor);
 /* Store Stuff */
 
 let showError = (err) => $msg.html(`<span class="text-danger">
-    Error: ${err.responseText || err.statusText || default_error}</span>`);
+    Error: ${err.statusText || default_error}</span>`);
 
 function loadHash(){
     if (window.location.hash !== '') {
