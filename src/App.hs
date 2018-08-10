@@ -7,6 +7,7 @@ module App
 import Data.Acid
 import Data.ByteString.Char8 (unpack)
 import Data.Text.Encoding (encodeUtf8)
+import Control.Exception (bracket)
 import Control.Monad.IO.Class
 import Crypto.Hash
 import Servant
@@ -33,13 +34,13 @@ server = (save :<|> load) :<|> serveDirectoryFileServer "static"
 
     load :: String -> Handler Snippet
     load sid = do
-        liftIO $ do
-            state <- openLocalState (SnippetDb Map.empty)
-            snip <- query state (GetSnippet $ SnippetId sid) >>= \case
-                Nothing -> return $ Snippet Text.empty
-                Just s -> return $ s
-            closeAcidState state
-            return snip
+        snip <- liftIO $ bracket
+            (openLocalState $ SnippetDb Map.empty)
+            closeAcidState
+            (flip query . GetSnippet $ SnippetId sid)
+        case snip of
+            Nothing -> throwError err404
+            Just c -> pure c
 
 api :: Proxy API
 api = Proxy

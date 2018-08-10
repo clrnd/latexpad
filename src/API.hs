@@ -8,10 +8,8 @@ import Servant
 
 import Types
 
-type SnippetAPI =
-         "save" :> ReqBody '[JSON] Snippet :> Post '[JSON] SnippetId
-    :<|> "load" :> Capture "id" String :> Get '[JSON] Snippet
+type SnippetAPI = "save" :> ReqBody '[JSON] Snippet :> Post '[JSON] SnippetId
+             :<|> "load" :> Capture "id" String :> Get '[JSON] Snippet
 
-type API =
-         "api" :> SnippetAPI
-    :<|> Raw
+type API = "api" :> SnippetAPI
+      :<|> Raw
