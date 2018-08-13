@@ -25,11 +25,11 @@ server = (save :<|> load) :<|> serveDirectoryFileServer "static"
         let bytes = encodeUtf8 s
         let hex = digestToHexByteString (hash bytes :: Digest MD5)
         let sid = SnippetId . unpack $ hex
-        liftIO $ do
-            state <- openLocalState (SnippetDb Map.empty)
-            update state (AddSnippet sid $ Snippet s)
-            closeAcidState state
-            return sid
+        liftIO $ bracket
+            (openLocalState $ SnippetDb Map.empty)
+            closeAcidState
+            (flip update . AddSnippet sid $ Snippet s)
+        pure sid
 
     load :: String -> Handler Snippet
     load sid = do
