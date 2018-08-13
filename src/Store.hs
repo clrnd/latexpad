@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 module Store
@@ -5,23 +6,21 @@ module Store
   , AddSnippet(AddSnippet)
   ) where
 
-import GHC.Generics
 import Control.Monad.Reader (ask)
 import Control.Monad.State (modify)
 import Data.Acid
 import Data.SafeCopy (base, deriveSafeCopy)
-import Data.Typeable
 import qualified Data.Map as Map
 
 import Types
 
 
 addSnippet :: SnippetId -> Snippet -> Update SnippetDb ()
-addSnippet (SnippetId id') snippet =
+addSnippet id' snippet =
     modify $ \(SnippetDb db) -> SnippetDb $ Map.insert id' snippet db
 
 getSnippet :: SnippetId -> Query SnippetDb (Maybe Snippet)
-getSnippet (SnippetId id') =
+getSnippet id' =
     Map.lookup id' . allSnippets <$> ask
 
 deriveSafeCopy 0 'base ''Snippet

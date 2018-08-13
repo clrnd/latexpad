@@ -2,6 +2,7 @@
 {-# LANGUAGE TypeOperators #-}
 module API
   ( API
+  , SnippetAPI
   ) where
 
 import Servant

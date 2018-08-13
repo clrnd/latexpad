@@ -15,7 +15,7 @@ import Data.Map (Map)
 
 newtype SnippetId = SnippetId
   { snippetId :: String
-  } deriving (Eq, Show, Generic)
+  } deriving (Eq, Ord, Show, Typeable, Generic)
 
 instance ToJSON SnippetId
 
@@ -27,5 +27,5 @@ instance ToJSON Snippet
 instance FromJSON Snippet
 
 newtype SnippetDb = SnippetDb
-    { allSnippets :: Map String Snippet
+    { allSnippets :: Map SnippetId Snippet
     } deriving (Typeable)

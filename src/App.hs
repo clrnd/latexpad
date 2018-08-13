@@ -11,7 +11,6 @@ import Control.Exception (bracket)
 import Control.Monad.IO.Class
 import Crypto.Hash
 import Servant
-import qualified Data.Text as Text
 import qualified Data.Map as Map
 
 import API
