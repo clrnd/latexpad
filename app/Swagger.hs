@@ -8,7 +8,7 @@ import Data.Swagger
 import Servant.Swagger
 import Data.Text (Text)
 import qualified Data.Text.IO as T
-import qualified Data.Text.Lazy as T
+import qualified Data.Text.Lazy as Lazy
 
 import App
 import Types
@@ -16,11 +16,11 @@ import Types
 instance ToSchema Snippet
 instance ToSchema SnippetId
 
-jsonSwagger :: T.Text
+jsonSwagger :: Lazy.Text
 jsonSwagger = encodeToLazyText $ toSwagger api
 
-interpolate :: Text -> Text
-interpolate json = [text|
+render :: Text -> Text
+render json = [text|
     <html>
     <head>
         <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@3.12.1/swagger-ui.css">
@@ -47,4 +47,4 @@ interpolate json = [text|
 |]
 
 main :: IO ()
-main = T.putStrLn . interpolate . T.toStrict $ jsonSwagger
+main = T.putStrLn . render . Lazy.toStrict $ jsonSwagger

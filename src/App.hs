@@ -1,4 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
 module App
   ( api
   , app
@@ -17,6 +16,11 @@ import API
 import Store
 import Types
 
+withLocalState ::  (AcidState SnippetDb -> IO a) -> IO a
+withLocalState = bracket
+    (openLocalState $ SnippetDb Map.empty)
+    closeAcidState
+
 server :: Server API
 server = (save :<|> load) :<|> serveDirectoryFileServer "static"
   where
@@ -25,17 +29,13 @@ server = (save :<|> load) :<|> serveDirectoryFileServer "static"
         let bytes = encodeUtf8 s
         let hex = digestToHexByteString (hash bytes :: Digest MD5)
         let sid = SnippetId . unpack $ hex
-        liftIO $ bracket
-            (openLocalState $ SnippetDb Map.empty)
-            closeAcidState
+        liftIO $ withLocalState
             (flip update . AddSnippet sid $ Snippet s)
         pure sid
 
     load :: String -> Handler Snippet
     load sid = do
-        snip <- liftIO $ bracket
-            (openLocalState $ SnippetDb Map.empty)
-            closeAcidState
+        snip <- liftIO $ withLocalState
             (flip query . GetSnippet $ SnippetId sid)
         case snip of
             Nothing -> throwError err404
