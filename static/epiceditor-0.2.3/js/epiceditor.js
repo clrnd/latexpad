@@ -13,7 +13,7 @@
   function _applyAttrs(context, attrs) {
     for (var attr in attrs) {
       if (attrs.hasOwnProperty(attr)) {
-        context[attr] = attrs[attr];
+        context.setAttribute(attr, attrs[attr]);
       }
     }
   }
@@ -407,6 +407,16 @@
     else if (typeof self.settings.container == 'object') {
       self.element = self.settings.container;
     }
+
+    if (typeof self.settings.textarea == 'undefined' && typeof self.element != 'undefined') {
+      var textareas = self.element.getElementsByTagName('textarea');
+      if (textareas.length > 0) {
+        self.settings.textarea = textareas[0];
+        _applyStyles(self.settings.textarea, {
+          display: 'none'
+        });
+      }
+    }
     
     // Figure out the file name. If no file name is given we'll use the ID.
     // If there's no ID either we'll use a namespaced file name that's incremented
@@ -567,15 +577,21 @@
     };
 
     // Write an iframe and then select it for the editor
-    self.element.innerHTML = '<iframe scrolling="no" frameborder="0" id= "' + self._instanceId + '"></iframe>';
+    iframeElement = document.createElement('iframe');
+    _applyAttrs(iframeElement, {
+      scrolling: 'no',
+      frameborder: 0,
+      id: self._instanceId
+    });
+    
+    
+    self.element.appendChild(iframeElement);
 
     // Because browsers add things like invisible padding and margins and stuff
     // to iframes, we need to set manually set the height so that the height
     // doesn't keep increasing (by 2px?) every time reflow() is called.
     // FIXME: Figure out how to fix this without setting this
     self.element.style.height = self.element.offsetHeight + 'px';
-
-    iframeElement = document.getElementById(self._instanceId);
     
     // Store a reference to the iframeElement itself
     self.iframeElement = iframeElement;
@@ -684,17 +700,20 @@
 
     // TODO: Move into fullscreen setup function (_setupFullscreen)
     _elementStates = {}
-    self._goFullscreen = function (el) {
+    self._goFullscreen = function (el, callback) {
+      callback = callback || function () {};
+      var wait = 0;
       this._fixScrollbars('auto');
 
       if (self.is('fullscreen')) {
-        self._exitFullscreen(el);
+        self._exitFullscreen(el, callback);
         return;
       }
 
       if (nativeFs) {
         if (nativeFsWebkit) {
           el.webkitRequestFullScreen();
+          wait = 750;
         }
         else if (nativeFsMoz) {
           el.mozRequestFullScreen();
@@ -706,85 +725,99 @@
 
       _isInEdit = self.is('edit');
 
-      // Set the state of EE in fullscreen
-      // We set edit and preview to true also because they're visible
-      // we might want to allow fullscreen edit mode without preview (like a "zen" mode)
-      self._eeState.fullscreen = true;
-      self._eeState.edit = true;
-      self._eeState.preview = true;
 
-      // Cache calculations
-      var windowInnerWidth = window.innerWidth
-        , windowInnerHeight = window.innerHeight
-        , windowOuterWidth = window.outerWidth
-        , windowOuterHeight = window.outerHeight;
+      // Why does this need to be in a randomly "750"ms setTimeout? WebKit's
+      // implementation of fullscreen seem to trigger the webkitfullscreenchange
+      // event _after_ everything is done. Instead, it triggers _during_ the
+      // transition. This means calculations of what's half, 100%, etc are wrong
+      // so to combat this we throw down the hammer with a setTimeout and wait
+      // to trigger our calculation code.
+      // See: https://code.google.com/p/chromium/issues/detail?id=181116
+      setTimeout(function () {
+        // Set the state of EE in fullscreen
+        // We set edit and preview to true also because they're visible
+        // we might want to allow fullscreen edit mode without preview (like a "zen" mode)
+        self._eeState.fullscreen = true;
+        self._eeState.edit = true;
+        self._eeState.preview = true;
 
-      // Without this the scrollbars will get hidden when scrolled to the bottom in faux fullscreen (see #66)
-      if (!nativeFs) {
-        windowOuterHeight = window.innerHeight;
-      }
+        // Cache calculations
+        var windowInnerWidth = window.innerWidth
+          , windowInnerHeight = window.innerHeight
+          , windowOuterWidth = window.outerWidth
+          , windowOuterHeight = window.outerHeight;
 
-      // This MUST come first because the editor is 100% width so if we change the width of the iframe or wrapper
-      // the editor's width wont be the same as before
-      _elementStates.editorIframe = _saveStyleState(self.editorIframe, 'save', {
-        'width': windowOuterWidth / 2 + 'px'
-      , 'height': windowOuterHeight + 'px'
-      , 'float': 'left' // Most browsers
-      , 'cssFloat': 'left' // FF
-      , 'styleFloat': 'left' // Older IEs
-      , 'display': 'block'
-      , 'position': 'static'
-      , 'left': ''
-      });
+        // Without this the scrollbars will get hidden when scrolled to the bottom in faux fullscreen (see #66)
+        if (!nativeFs) {
+          windowOuterHeight = window.innerHeight;
+        }
 
-      // the previewer
-      _elementStates.previewerIframe = _saveStyleState(self.previewerIframe, 'save', {
-        'width': windowOuterWidth / 2 + 'px'
-      , 'height': windowOuterHeight + 'px'
-      , 'float': 'right' // Most browsers
-      , 'cssFloat': 'right' // FF
-      , 'styleFloat': 'right' // Older IEs
-      , 'display': 'block'
-      , 'position': 'static'
-      , 'left': ''
-      });
+        // This MUST come first because the editor is 100% width so if we change the width of the iframe or wrapper
+        // the editor's width wont be the same as before
+        _elementStates.editorIframe = _saveStyleState(self.editorIframe, 'save', {
+          'width': windowOuterWidth / 2 + 'px'
+        , 'height': windowOuterHeight + 'px'
+        , 'float': 'left' // Most browsers
+        , 'cssFloat': 'left' // FF
+        , 'styleFloat': 'left' // Older IEs
+        , 'display': 'block'
+        , 'position': 'static'
+        , 'left': ''
+        });
 
-      // Setup the containing element CSS for fullscreen
-      _elementStates.element = _saveStyleState(self.element, 'save', {
-        'position': 'fixed'
-      , 'top': '0'
-      , 'left': '0'
-      , 'width': '100%'
-      , 'z-index': '9999' // Most browsers
-      , 'zIndex': '9999' // Firefox
-      , 'border': 'none'
-      , 'margin': '0'
-      // Should use the base styles background!
-      , 'background': _getStyle(self.editor, 'background-color') // Try to hide the site below
-      , 'height': windowInnerHeight + 'px'
-      });
+        // the previewer
+        _elementStates.previewerIframe = _saveStyleState(self.previewerIframe, 'save', {
+          'width': windowOuterWidth / 2 + 'px'
+        , 'height': windowOuterHeight + 'px'
+        , 'float': 'right' // Most browsers
+        , 'cssFloat': 'right' // FF
+        , 'styleFloat': 'right' // Older IEs
+        , 'display': 'block'
+        , 'position': 'static'
+        , 'left': ''
+        });
 
-      // The iframe element
-      _elementStates.iframeElement = _saveStyleState(self.iframeElement, 'save', {
-        'width': windowOuterWidth + 'px'
-      , 'height': windowInnerHeight + 'px'
-      });
+        // Setup the containing element CSS for fullscreen
+        _elementStates.element = _saveStyleState(self.element, 'save', {
+          'position': 'fixed'
+        , 'top': '0'
+        , 'left': '0'
+        , 'width': '100%'
+        , 'z-index': '9999' // Most browsers
+        , 'zIndex': '9999' // Firefox
+        , 'border': 'none'
+        , 'margin': '0'
+        // Should use the base styles background!
+        , 'background': _getStyle(self.editor, 'background-color') // Try to hide the site below
+        , 'height': windowInnerHeight + 'px'
+        });
 
-      // ...Oh, and hide the buttons and prevent scrolling
-      utilBtns.style.visibility = 'hidden';
+        // The iframe element
+        _elementStates.iframeElement = _saveStyleState(self.iframeElement, 'save', {
+          'width': windowOuterWidth + 'px'
+        , 'height': windowInnerHeight + 'px'
+        });
 
-      if (!nativeFs) {
-        document.body.style.overflow = 'hidden';
-      }
+        // ...Oh, and hide the buttons and prevent scrolling
+        utilBtns.style.visibility = 'hidden';
 
-      self.preview();
+        if (!nativeFs) {
+          document.body.style.overflow = 'hidden';
+        }
 
-      self.focus();
+        self.preview();
 
-      self.emit('fullscreenenter');
+        self.focus();
+
+        self.emit('fullscreenenter');
+
+        callback.call(self);
+      }, wait);
+
     };
 
-    self._exitFullscreen = function (el) {
+    self._exitFullscreen = function (el, callback) {
+      callback = callback || function () {};
       this._fixScrollbars();
 
       _saveStyleState(self.element, 'apply', _elementStates.element);
@@ -831,6 +864,8 @@
       self.reflow();
 
       self.emit('fullscreenexit');
+
+      callback.call(self);
     };
 
     // This setups up live previews by triggering preview() IF in fullscreen on keyup
@@ -926,6 +961,7 @@
     function shortcutHandler(e) {
       if (e.keyCode == self.settings.shortcut.modifier) { isMod = true } // check for modifier press(default is alt key), save to var
       if (e.keyCode == 17) { isCtrl = true } // check for ctrl/cmnd press, in order to catch ctrl/cmnd + s
+      if (e.keyCode == 18) { isCtrl = false }
 
       // Check for alt+p and make sure were not in fullscreen - default shortcut to switch to preview
       if (isMod === true && e.keyCode == self.settings.shortcut.preview && !self.is('fullscreen')) {
@@ -1113,7 +1149,6 @@
 
   EpicEditor.prototype._setupTextareaSync = function () {
     var self = this
-      , textareaFileName = self.settings.file.name
       , _syncTextarea;
 
     // Even if autoSave is false, we want to make sure to keep the textarea synced
@@ -1132,7 +1167,10 @@
       // This only happens for draft files. Probably has something to do with
       // the fact draft files haven't been saved by the time this is called.
       // TODO: Add test for this case.
-      self._textareaElement.value = self.exportFile(textareaFileName, 'text', true) || self.settings.file.defaultContent;
+      // Get the file.name each time as it can change. DO NOT save this to a
+      // var outside of this closure or the editor will stop syncing when the
+      // file is changed with importFile or open.
+      self._textareaElement.value = self.exportFile(self.settings.file.name, 'text', true) || self.settings.file.defaultContent;
     }
 
     if (typeof self.settings.textarea == 'string') {
@@ -1156,7 +1194,7 @@
     // If the developer wants drafts to be recoverable they should check if
     // the local file in localStorage's modified date is newer than the server.
     if (self._textareaElement.value !== '') {
-      self.importFile(textareaFileName, self._textareaElement.value);
+      self.importFile(self.settings.file.name, self._textareaElement.value);
 
       // manually save draft after import so there is no delay between the
       // import and exporting in _syncTextarea. Without this, _syncTextarea
@@ -1169,6 +1207,8 @@
 
     // Make sure to keep it updated
     self.on('__update', _syncTextarea);
+    self.on('__create', _syncTextarea);
+    self.on('__save', _syncTextarea);
   }
 
   /**
@@ -1208,7 +1248,6 @@
     callback = callback || function () {};
 
     if (self.settings.textarea) {
-      self._textareaElement.value = "";
       self.removeListener('__update');
     }
 
@@ -1340,9 +1379,13 @@
    * Puts the editor into fullscreen mode
    * @returns {object} EpicEditor will be returned
    */
-  EpicEditor.prototype.enterFullscreen = function () {
-    if (this.is('fullscreen')) { return this; }
-    this._goFullscreen(this.iframeElement);
+  EpicEditor.prototype.enterFullscreen = function (callback) {
+    callback = callback || function () {};
+    if (this.is('fullscreen')) {
+      callback.call(this);
+      return this;
+    }
+    this._goFullscreen(this.iframeElement, callback);
     return this;
   }
 
@@ -1350,9 +1393,13 @@
    * Closes fullscreen mode if opened
    * @returns {object} EpicEditor will be returned
    */
-  EpicEditor.prototype.exitFullscreen = function () {
-    if (!this.is('fullscreen')) { return this; }
-    this._exitFullscreen(this.iframeElement);
+  EpicEditor.prototype.exitFullscreen = function (callback) {
+    callback = callback || function () {};
+    if (!this.is('fullscreen')) {
+      callback.call(this);
+      return this;
+    }
+    this._exitFullscreen(this.iframeElement, callback);
     return this;
   }
 
@@ -1461,6 +1508,7 @@
     var self = this
       , storage
       , isUpdate = false
+      , isNew = false
       , file = self.settings.file.name
       , previewDraftName = ''
       , data = this._storage[previewDraftName + self.settings.localStorageName]
@@ -1482,6 +1530,7 @@
       // If the file doesn't exist we need to create it
       if (storage[file] === undefined) {
         storage[file] = self._defaultFileSchema();
+        isNew = true;
       }
 
       // If it does, we need to check if the content is different and
@@ -1498,10 +1547,17 @@
       storage[file].content = content;
       this._storage[previewDraftName + self.settings.localStorageName] = JSON.stringify(storage);
 
-      // After the content is actually changed, emit update so it emits the updated content
+      // If it's a new file, send a create event as well as a private one for
+      // use internally.
+      if (isNew) {
+        self.emit('create');
+        self.emit('__create');
+      }
+
+      // After the content is actually changed, emit update so it emits the
+      // updated content. Also send a private event for interal use.
       if (isUpdate) {
         self.emit('update');
-        // Emit a private update event so it can't get accidentally removed
         self.emit('__update');
       }
 
@@ -1510,6 +1566,7 @@
       }
       else if (!_isPreviewDraft) {
         this.emit('save');
+        self.emit('__save');
       }
     }
 
@@ -1563,25 +1620,16 @@
    * @returns {object} EpicEditor will be returned
    */
   EpicEditor.prototype.importFile = function (name, content, kind, meta) {
-    var self = this
-      , isNew = false;
+    var self = this;
 
     name = name || self.settings.file.name;
     content = content || '';
     kind = kind || 'md';
     meta = meta || {};
   
-    if (JSON.parse(this._storage[self.settings.localStorageName])[name] === undefined) {
-      isNew = true;
-    }
-
     // Set our current file to the new file and update the content
     self.settings.file.name = name;
     _setText(self.editor, content);
-
-    if (isNew) {
-      self.emit('create');
-    }
 
     self.save();
 

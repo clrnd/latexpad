@@ -49,7 +49,7 @@
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script src="epiceditor-0.2.2/js/epiceditor.min.js"></script>
+    <script src="epiceditor-0.2.3/js/epiceditor.min.js"></script>
 </head>
 <body>
     <h1 class="page-header" id="title">
@@ -60,17 +60,20 @@
         <span id="message" class="message"></span>
     </h1>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="output" id="math-preview"></div>
-            <div class="output" id="math-buffer"></div>
-        </div>
-        <div class="col-md-6">
-            <div id="input"></div>
+    <div class="container">
+        <div class="row">
+            <div id="left-pane" class="col-md-6">
+                <button class="btn btn-default" id="btn-fullscreen">
+                    <span class="glyphicon glyphicon-fullscreen"></span>
+                </button>
+                <div class="output" id="math-preview"></div>
+                <div class="output" id="math-buffer"></div>
+            </div>
+            <div id="right-pane" class="col-md-6">
+                <div id="input"></div>
+            </div>
         </div>
     </div>
-</div>
 
     <footer id="footer">
         <div class="container">

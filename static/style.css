@@ -7,6 +7,10 @@ body {
     margin-bottom: 40px;
 }
 
+#left-pane {
+    position: relative;
+}
+
 #footer {
     position: absolute;
     bottom: 0;
@@ -22,12 +26,6 @@ body {
 
 #input {
     min-height: 400px;
-}
-
-@media (min-width: 992px){
-    #input {
-        margin-top: -20px;
-    }
 }
 
 .output {
@@ -51,4 +49,14 @@ body {
 #title .message span {
     display: inline-block;
     margin: 0 16px;
+}
+
+#btn-fullscreen {
+    position: absolute;
+    right: 5px;
+    top: 10px;
+}
+
+.page-header {
+    margin-bottom: 0;
 }

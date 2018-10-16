@@ -1,7 +1,6 @@
 "use strict";
 
 let $msg = $('#message');
-let $output = $('#output');
 let default_error = "Something went ups";
 
 /* Editor Stuff */
@@ -11,9 +10,9 @@ function update(){
     Preview.Update();
 }
 
-let editor = new EpicEditor({
+var editor = new EpicEditor({
         container: $('#input').get(0),
-        basePath: 'epiceditor-0.2.2',
+        basePath: 'epiceditor-0.2.3',
         clientSideStorage: false,
         button: false,
         autogrow: true
@@ -24,6 +23,14 @@ let editor = new EpicEditor({
 function reset(){
     let proforma = $("#proforma").val();
     editor.importFile(null, proforma);
+}
+
+function toggle_fs(){
+    $('#left-pane').toggleClass('col-md-12');
+    $('#left-pane').toggleClass('col-md-6');
+    $('#right-pane').toggleClass('col-md-12');
+    $('#right-pane').toggleClass('col-md-6');
+    editor.reflow();
 }
 
 Preview.Init(editor);
@@ -77,5 +84,7 @@ $('#save').on('click', (ev) => {
         NProgress.done();
     });
 });
+
+$('#btn-fullscreen').on('click', toggle_fs);
 
 loadHash();
